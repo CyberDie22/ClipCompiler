@@ -84,7 +84,6 @@ class Parser(text: String) {
     }
 
     private fun parsePrimaryExpression(): ExpressionSyntax {
-//        println(current.kind)
         when (current.kind) {
             SyntaxKind.OpenParenthesisToken -> {
                 val left = nextToken()
@@ -94,7 +93,7 @@ class Parser(text: String) {
             }
             SyntaxKind.FalseKeyword, SyntaxKind.TrueKeyword -> {
                 val keywordToken = nextToken()
-                val value = current.kind == SyntaxKind.TrueKeyword
+                val value = keywordToken.kind == SyntaxKind.TrueKeyword
                 return LiteralExpressionSyntax(keywordToken, value)
             }
             else -> {
@@ -108,15 +107,17 @@ class Parser(text: String) {
 
 fun SyntaxKind.getBinaryOperatorPrecedence(): Int {
     return when (this) {
-        in listOf(SyntaxKind.ExponentToken) -> 3
-        in listOf(SyntaxKind.TimesToken, SyntaxKind.DivideToken, SyntaxKind.ModuloToken) -> 2
-        in listOf(SyntaxKind.PlusToken, SyntaxKind.MinusToken) -> 1
+        SyntaxKind.ExponentToken -> 5
+        SyntaxKind.TimesToken, SyntaxKind.DivideToken, SyntaxKind.ModuloToken -> 4
+        SyntaxKind.PlusToken, SyntaxKind.MinusToken -> 3
+        SyntaxKind.LogicalAndToken -> 2
+        SyntaxKind.LogicalOrToken -> 1
         else -> 0
     }
 }
 fun SyntaxKind.getUnaryOperatorPrecedence(): Int {
     return when (this) {
-        in listOf(SyntaxKind.PlusToken, SyntaxKind.MinusToken) -> 3
+        SyntaxKind.PlusToken, SyntaxKind.MinusToken, SyntaxKind.LogicalNotToken -> 3
         else -> 0
     }
 }

@@ -17,7 +17,13 @@ class Lexer(private val text: String) {
     }
 
     private val current: Char
-        get() = if (position >= text.length) '\u0000' else text[position]
+        get() = peek(0)
+    private val lookahead: Char
+        get() = peek(1)
+
+    private fun peek(offset: Int): Char {
+        return if (position + offset >= text.length) '\u0000' else text[position + offset]
+    }
 
     private fun next() {
         position++
@@ -68,20 +74,43 @@ class Lexer(private val text: String) {
             return SyntaxToken(kind, start, text, null)
         }
 
-        return when (current) {
-            '+' -> SyntaxToken(SyntaxKind.PlusToken, position++, "+", null)
-            '-' -> SyntaxToken(SyntaxKind.MinusToken, position++, "-", null)
-            '*' -> SyntaxToken(SyntaxKind.TimesToken, position++, "*", null)
-            '/' -> SyntaxToken(SyntaxKind.DivideToken, position++, "/", null)
-            '%' -> SyntaxToken(SyntaxKind.ModuloToken, position++, "%", null)
-            '^' -> SyntaxToken(SyntaxKind.ExponentToken, position++, "^", null)
-            '(' -> SyntaxToken(SyntaxKind.OpenParenthesisToken, position++, "(", null)
-            ')' -> SyntaxToken(SyntaxKind.CloseParenthesisToken, position++, ")", null)
+        when {
+            current == '+' -> return returnSyntaxTokenForCharacterLiteral('+', SyntaxKind.PlusToken)
+            current == '-' -> return returnSyntaxTokenForCharacterLiteral('-', SyntaxKind.MinusToken)
+            current == '*' -> return returnSyntaxTokenForCharacterLiteral('*', SyntaxKind.TimesToken)
+            current == '/' -> return returnSyntaxTokenForCharacterLiteral('/', SyntaxKind.DivideToken)
+            current == '%' -> return returnSyntaxTokenForCharacterLiteral('%', SyntaxKind.ModuloToken)
+            current == '^' -> return returnSyntaxTokenForCharacterLiteral('^', SyntaxKind.ExponentToken)
+            current == '(' -> return returnSyntaxTokenForCharacterLiteral('(', SyntaxKind.OpenParenthesisToken)
+            current == ')' -> return returnSyntaxTokenForCharacterLiteral(')', SyntaxKind.CloseParenthesisToken)
+            current == '!' -> return returnSyntaxTokenForCharacterLiteral('!', SyntaxKind.LogicalNotToken)
+            current == '&' && lookahead == '&' -> return returnSyntaxTokenForCharacterLiteral("||", SyntaxKind.LogicalAndToken, 2)
+            current == '|' && lookahead == '|' -> return returnSyntaxTokenForCharacterLiteral("||", SyntaxKind.LogicalOrToken, 2)
             else -> {
                 diagnostics.add(colorize("ERROR: Bad character input: '$current'", ERROR))
-                SyntaxToken(SyntaxKind.BadToken, position++, text.subSequence(position - 1, position) as String, null)
+                return SyntaxToken(SyntaxKind.BadToken, position++, text.subSequence(position - 1, position) as String, null)
             }
         }
+    }
+
+    private fun returnSyntaxTokenForCharacterLiteral(char: Char, kind: SyntaxKind): SyntaxToken {
+        return SyntaxToken(kind, position++, char.toString(), null)
+    }
+
+    private fun returnSyntaxTokenForCharacterLiteral(char: String, kind: SyntaxKind): SyntaxToken {
+        return SyntaxToken(kind, position++, char, null)
+    }
+
+    private fun returnSyntaxTokenForCharacterLiteral(char: Char, kind: SyntaxKind, posInc: Int): SyntaxToken {
+        val position = position
+        this.position += posInc
+        return SyntaxToken(kind, position, char.toString(), null)
+    }
+
+    private fun returnSyntaxTokenForCharacterLiteral(char: String, kind: SyntaxKind, posInc: Int): SyntaxToken {
+        val position = position
+        this.position += posInc
+        return SyntaxToken(kind, position, char, null)
     }
 
     private fun getKeywordKind(keyword: String): SyntaxKind {

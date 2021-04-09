@@ -54,27 +54,57 @@ class IRTypeChecker {
     }
 
     private fun bindUnaryOperatorKind(kind: SyntaxKind, operandType: Class<*>): IRUnaryOperatorKind? {
-        if (operandType != Int::class.java)
-            return null
-        return when (kind) {
-            SyntaxKind.PlusToken -> IRUnaryOperatorKind.Identity
-            SyntaxKind.MinusToken -> IRUnaryOperatorKind.Negation
-            else -> throw Exception(colorize("Unexpected unary operator $kind", ERROR))
+        val javaIntegerClass = Class.forName("java.lang.Integer")
+        val javaBooleanClass = Class.forName("java.lang.Boolean")
+        if (operandType == javaIntegerClass) {
+            return when (kind) {
+                SyntaxKind.PlusToken -> IRUnaryOperatorKind.Identity
+                SyntaxKind.MinusToken -> IRUnaryOperatorKind.Negation
+                else -> {
+                    diagnostics.add(colorize("Unexpected unary operator $kind", ERROR))
+                    null
+                }
+            }
         }
+        if (operandType == javaBooleanClass) {
+            return when (kind) {
+                SyntaxKind.LogicalNotToken -> IRUnaryOperatorKind.LogicalNegation
+                else -> {
+                    diagnostics.add(colorize("Unexpected unary operator $kind", ERROR))
+                    null
+                }
+            }
+        }
+        return null
     }
 
     private fun bindBinaryOperatorKind(kind: SyntaxKind, leftType: Class<*>, rightType: Class<*>): IRBinaryOperatorKind? {
         val javaIntegerClass = Class.forName("java.lang.Integer")
-        if (leftType != javaIntegerClass || rightType != javaIntegerClass)
-            return null
-        return when (kind) {
-            SyntaxKind.PlusToken -> IRBinaryOperatorKind.Plus
-            SyntaxKind.MinusToken -> IRBinaryOperatorKind.Minus
-            SyntaxKind.TimesToken -> IRBinaryOperatorKind.Times
-            SyntaxKind.DivideToken -> IRBinaryOperatorKind.Division
-            SyntaxKind.ModuloToken -> IRBinaryOperatorKind.Modulus
-            SyntaxKind.ExponentToken -> IRBinaryOperatorKind.Exponent
-            else -> throw Exception(colorize("Unexpected binary operator $kind", ERROR))
+        val javaBooleanClass = Class.forName("java.lang.Boolean")
+        if (leftType == javaIntegerClass && rightType == javaIntegerClass) {
+            return when (kind) {
+                SyntaxKind.PlusToken -> IRBinaryOperatorKind.Plus
+                SyntaxKind.MinusToken -> IRBinaryOperatorKind.Minus
+                SyntaxKind.TimesToken -> IRBinaryOperatorKind.Times
+                SyntaxKind.DivideToken -> IRBinaryOperatorKind.Division
+                SyntaxKind.ModuloToken -> IRBinaryOperatorKind.Modulus
+                SyntaxKind.ExponentToken -> IRBinaryOperatorKind.Exponent
+                else -> {
+                    diagnostics.add(colorize("Unexpected binary operator $kind", ERROR))
+                    null
+                }
+            }
         }
+        if (leftType == javaBooleanClass && rightType == javaBooleanClass) {
+            return when (kind) {
+                SyntaxKind.LogicalAndToken -> IRBinaryOperatorKind.LogicalAnd
+                SyntaxKind.LogicalOrToken -> IRBinaryOperatorKind.LogicalOr
+                else -> {
+                    diagnostics.add(colorize("Unexpected binary operator $kind", ERROR))
+                    null
+                }
+            }
+        }
+        return null
     }
 }

@@ -16,6 +16,9 @@ enum class SyntaxKind {
     OpenParenthesisToken,
     CloseParenthesisToken,
     IdentifierToken,
+    LogicalNotToken,
+    LogicalAndToken,
+    LogicalOrToken,
 
     // Expressions
     LiteralExpression,

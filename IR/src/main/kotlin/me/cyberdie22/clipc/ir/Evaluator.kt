@@ -24,26 +24,29 @@ class Evaluator(private val root: IRExpression) {
             return root.value
 
         if (root is IRUnaryExpression) {
-            val operand = evaluateExpression(root.operand) as Int
+            val operand = evaluateExpression(root.operand)
 
             return when (root.operatorKind) {
-                IRUnaryOperatorKind.Identity -> +operand
-                IRUnaryOperatorKind.Negation -> -operand
+                IRUnaryOperatorKind.Identity -> +(operand as Int)
+                IRUnaryOperatorKind.Negation -> -(operand as Int)
+                IRUnaryOperatorKind.LogicalNegation -> !(operand as Boolean)
                 else -> throw Exception("Unexpected unary operator ${root.operatorKind}")
             }
         }
 
         if (root is IRBinaryExpression) {
-            val left = evaluateExpression(root.left) as Int
-            val right = evaluateExpression(root.right) as Int
+            val left = evaluateExpression(root.left)
+            val right = evaluateExpression(root.right)
 
             return when (root.operatorKind) {
-                IRBinaryOperatorKind.Plus -> left + right
-                IRBinaryOperatorKind.Minus -> left - right
-                IRBinaryOperatorKind.Times -> left * right
-                IRBinaryOperatorKind.Division -> left / right
-                IRBinaryOperatorKind.Modulus -> left % right
-                IRBinaryOperatorKind.Exponent -> left.toDouble().pow(right.toDouble()).toInt()
+                IRBinaryOperatorKind.Plus -> (left as Int) + (right as Int)
+                IRBinaryOperatorKind.Minus -> (left as Int) - (right as Int)
+                IRBinaryOperatorKind.Times -> (left as Int) * (right as Int)
+                IRBinaryOperatorKind.Division -> (left as Int) / (right as Int)
+                IRBinaryOperatorKind.Modulus -> (left as Int) % (right as Int)
+                IRBinaryOperatorKind.Exponent -> (left as Double).pow(right as Double).toInt()
+                IRBinaryOperatorKind.LogicalAnd -> (left as Boolean) && (right as Boolean)
+                IRBinaryOperatorKind.LogicalOr -> (left as Boolean) || (right as Boolean)
                 else -> throw Exception(colorize("Unexpected binary operator '${root.operatorKind}'", ERROR))
             }
         }
