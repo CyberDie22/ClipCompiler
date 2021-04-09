@@ -15,5 +15,6 @@ enum class SyntaxKind {
     BadToken,
     LiteralExpression,
     BinaryExpression,
-    ParenthesizedExpression
+    ParenthesizedExpression,
+    UnaryExpression
 }

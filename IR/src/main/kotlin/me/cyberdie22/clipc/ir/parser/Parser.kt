@@ -61,7 +61,14 @@ class Parser(text: String) {
     }
 
     private fun parseExpression(parentPrecedence: Int = 0): ExpressionSyntax {
-        var left = parsePrimaryExpression()
+        var left: ExpressionSyntax
+        val unaryOperatorPrecedence = current.kind.getUnaryOperatorPrecedence()
+        if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence) {
+            val operatorToken = nextToken()
+            val operand = parseExpression(unaryOperatorPrecedence)
+            left = UnaryExpressionSyntax(operatorToken, operand)
+        } else
+            left = parsePrimaryExpression()
 
         while (true) {
             val precedence = current.kind.getBinaryOperatorPrecedence()
@@ -94,6 +101,12 @@ fun SyntaxKind.getBinaryOperatorPrecedence(): Int {
         in listOf(SyntaxKind.ExponentToken) -> 3
         in listOf(SyntaxKind.TimesToken, SyntaxKind.DivideToken, SyntaxKind.ModuloToken) -> 2
         in listOf(SyntaxKind.PlusToken, SyntaxKind.MinusToken) -> 1
+        else -> 0
+    }
+}
+fun SyntaxKind.getUnaryOperatorPrecedence(): Int {
+    return when (this) {
+        in listOf(SyntaxKind.PlusToken, SyntaxKind.MinusToken) -> 3
         else -> 0
     }
 }
