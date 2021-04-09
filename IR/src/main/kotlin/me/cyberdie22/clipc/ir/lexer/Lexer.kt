@@ -58,6 +58,16 @@ class Lexer(private val text: String) {
             return SyntaxToken(SyntaxKind.WhitespaceToken, start, text, null)
         }
 
+        if (current.isLetter()) {
+            val start = position
+
+            nextUntil { !current.isLetter() }
+
+            val text = text.subSequence(start, position) as String
+            val kind = getKeywordKind(text)
+            return SyntaxToken(kind, start, text, null)
+        }
+
         return when (current) {
             '+' -> SyntaxToken(SyntaxKind.PlusToken, position++, "+", null)
             '-' -> SyntaxToken(SyntaxKind.MinusToken, position++, "-", null)
@@ -71,6 +81,14 @@ class Lexer(private val text: String) {
                 diagnostics.add(colorize("ERROR: Bad character input: '$current'", ERROR))
                 SyntaxToken(SyntaxKind.BadToken, position++, text.subSequence(position - 1, position) as String, null)
             }
+        }
+    }
+
+    private fun getKeywordKind(keyword: String): SyntaxKind {
+        return when (keyword) {
+            "true" -> SyntaxKind.TrueKeyword
+            "false" -> SyntaxKind.FalseKeyword
+            else -> SyntaxKind.IdentifierToken
         }
     }
 

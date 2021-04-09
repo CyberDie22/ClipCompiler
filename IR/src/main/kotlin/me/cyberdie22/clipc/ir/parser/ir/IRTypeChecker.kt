@@ -26,7 +26,7 @@ class IRTypeChecker {
     }
 
     private fun bindLiteralExpression(syntax: LiteralExpressionSyntax): IRExpression {
-        val value = syntax.literalToken.value as Int?
+        val value = syntax.value
             ?: 0
         return IRLiteralExpression(value)
     }
@@ -35,7 +35,7 @@ class IRTypeChecker {
         val boundOperand = bindExpression(syntax.operand)
         val boundOperatorKind = bindUnaryOperatorKind(syntax.operatorToken.kind, boundOperand.type)
         if (boundOperatorKind == null) {
-            diagnostics.add(colorize("Unary operator '${syntax.operatorToken.text}' is not defined for type ${boundOperand.type.toGenericString()}", ERROR))
+            diagnostics.add(colorize("Unary operator '${syntax.operatorToken.text}' is not defined for type ${boundOperand.type.name}", ERROR))
             return boundOperand
         }
         return IRUnaryExpression(boundOperatorKind, boundOperand)
@@ -47,7 +47,7 @@ class IRTypeChecker {
         val boundRight = bindExpression(syntax.right)
         val boundOperatorKind = bindBinaryOperatorKind(syntax.operatorToken.kind, boundLeft.type, boundRight.type)
         if (boundOperatorKind == null) {
-            diagnostics.add(colorize("Unary operator '${syntax.operatorToken.text}' is not defined for types ${boundLeft.type.toGenericString()} and ${boundRight.type.toGenericString()}", ERROR))
+            diagnostics.add(colorize("Binary operator '${syntax.operatorToken.text}' is not defined for types ${boundLeft.type.name} and ${boundRight.type.name}", ERROR))
             return boundLeft
         }
         return IRBinaryExpression(boundLeft, boundOperatorKind, boundRight)
@@ -64,7 +64,8 @@ class IRTypeChecker {
     }
 
     private fun bindBinaryOperatorKind(kind: SyntaxKind, leftType: Class<*>, rightType: Class<*>): IRBinaryOperatorKind? {
-        if (leftType != Int::class.java || rightType != Int::class.java)
+        val javaIntegerClass = Class.forName("java.lang.Integer")
+        if (leftType != javaIntegerClass || rightType != javaIntegerClass)
             return null
         return when (kind) {
             SyntaxKind.PlusToken -> IRBinaryOperatorKind.Plus

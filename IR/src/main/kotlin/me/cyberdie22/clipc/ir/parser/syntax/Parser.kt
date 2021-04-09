@@ -84,14 +84,24 @@ class Parser(text: String) {
     }
 
     private fun parsePrimaryExpression(): ExpressionSyntax {
-        if (current.kind == SyntaxKind.OpenParenthesisToken) {
-            val left = nextToken()
-            val expression = parseExpression()
-            val right = matchToken(SyntaxKind.CloseParenthesisToken)
-            return ParenthesizedExpressionSyntax(left, expression, right)
+//        println(current.kind)
+        when (current.kind) {
+            SyntaxKind.OpenParenthesisToken -> {
+                val left = nextToken()
+                val expression = parseExpression()
+                val right = matchToken(SyntaxKind.CloseParenthesisToken)
+                return ParenthesizedExpressionSyntax(left, expression, right)
+            }
+            SyntaxKind.FalseKeyword, SyntaxKind.TrueKeyword -> {
+                val keywordToken = nextToken()
+                val value = current.kind == SyntaxKind.TrueKeyword
+                return LiteralExpressionSyntax(keywordToken, value)
+            }
+            else -> {
+                val numberToken = matchToken(SyntaxKind.NumberToken)
+                return LiteralExpressionSyntax(numberToken)
+            }
         }
-        val numberToken = matchToken(SyntaxKind.NumberToken)
-        return LiteralExpressionSyntax(numberToken)
     }
 
 }

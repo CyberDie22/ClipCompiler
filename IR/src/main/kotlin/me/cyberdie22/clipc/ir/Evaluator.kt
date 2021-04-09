@@ -14,17 +14,17 @@ val WARN = AnsiFormat(Attribute.YELLOW_TEXT())
 val ERROR = AnsiFormat(Attribute.TEXT_COLOR(139, 0, 0))
 
 class Evaluator(private val root: IRExpression) {
-    fun evaluate(): Int {
+    fun evaluate(): Any {
         return evaluateExpression(root)
     }
 
-    private fun evaluateExpression(root: IRExpression): Int {
+    private fun evaluateExpression(root: IRExpression): Any {
 
         if (root is IRLiteralExpression)
-            return root.value as Int
+            return root.value
 
         if (root is IRUnaryExpression) {
-            val operand = evaluateExpression(root.operand)
+            val operand = evaluateExpression(root.operand) as Int
 
             return when (root.operatorKind) {
                 IRUnaryOperatorKind.Identity -> +operand
@@ -34,8 +34,8 @@ class Evaluator(private val root: IRExpression) {
         }
 
         if (root is IRBinaryExpression) {
-            val left = evaluateExpression(root.left)
-            val right = evaluateExpression(root.right)
+            val left = evaluateExpression(root.left) as Int
+            val right = evaluateExpression(root.right) as Int
 
             return when (root.operatorKind) {
                 IRBinaryOperatorKind.Plus -> left + right

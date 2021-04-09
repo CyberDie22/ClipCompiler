@@ -1,9 +1,12 @@
 package me.cyberdie22.clipc.ir.lexer
 
 enum class SyntaxKind {
+
+    // Tokens
     EndOfFileToken,
-    NumberToken,
+    BadToken,
     WhitespaceToken,
+    NumberToken,
     PlusToken,
     MinusToken,
     TimesToken,
@@ -12,9 +15,15 @@ enum class SyntaxKind {
     ExponentToken,
     OpenParenthesisToken,
     CloseParenthesisToken,
-    BadToken,
+    IdentifierToken,
+
+    // Expressions
     LiteralExpression,
     BinaryExpression,
     ParenthesizedExpression,
-    UnaryExpression
+    UnaryExpression,
+
+    // Keywords
+    TrueKeyword,
+    FalseKeyword,
 }
