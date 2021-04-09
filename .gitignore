@@ -1,0 +1,8 @@
+# Gradle
+.gradle
+gradle
+
+# Binaries
+build
+IR/build
+JVM/build
