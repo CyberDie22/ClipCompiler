@@ -60,20 +60,11 @@ class Parser(text: String) {
         return SyntaxTree(diagnostics, expression, eofToken)
     }
 
-    private fun getBinaryOperatorPrecedence(kind: SyntaxKind): Int {
-        return when (kind) {
-            in listOf(SyntaxKind.ExponentToken) -> 3
-            in listOf(SyntaxKind.TimesToken, SyntaxKind.DivideToken, SyntaxKind.ModuloToken) -> 2
-            in listOf(SyntaxKind.PlusToken, SyntaxKind.MinusToken) -> 1
-            else -> 0
-        }
-    }
-
     private fun parseExpression(parentPrecedence: Int = 0): ExpressionSyntax {
         var left = parsePrimaryExpression()
 
         while (true) {
-            val precedence = getBinaryOperatorPrecedence(current.kind)
+            val precedence = current.kind.getBinaryOperatorPrecedence()
             if (precedence == 0 || precedence <= parentPrecedence)
                 break
 
@@ -96,4 +87,13 @@ class Parser(text: String) {
         return LiteralExpressionSyntax(numberToken)
     }
 
+}
+
+fun SyntaxKind.getBinaryOperatorPrecedence(): Int {
+    return when (this) {
+        in listOf(SyntaxKind.ExponentToken) -> 3
+        in listOf(SyntaxKind.TimesToken, SyntaxKind.DivideToken, SyntaxKind.ModuloToken) -> 2
+        in listOf(SyntaxKind.PlusToken, SyntaxKind.MinusToken) -> 1
+        else -> 0
+    }
 }
