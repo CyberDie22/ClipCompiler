@@ -1,16 +1,13 @@
 import com.diogonunes.jcolor.AnsiFormat
-import com.diogonunes.jcolor.Ansi
 import com.diogonunes.jcolor.Ansi.colorize
 import com.diogonunes.jcolor.Attribute.*
 import me.cyberdie22.clicommand.CLICommand
 import me.cyberdie22.clicommand.CLICommandManager
 import me.cyberdie22.clipc.ir.Evaluator
-import me.cyberdie22.clipc.ir.lexer.Lexer
-import me.cyberdie22.clipc.ir.lexer.SyntaxKind
 import me.cyberdie22.clipc.ir.lexer.SyntaxToken
-import me.cyberdie22.clipc.ir.parser.Parser
-import me.cyberdie22.clipc.ir.parser.SyntaxNode
-import me.cyberdie22.clipc.ir.parser.SyntaxTree
+import me.cyberdie22.clipc.ir.parser.ir.IRTypeChecker
+import me.cyberdie22.clipc.ir.parser.syntax.SyntaxNode
+import me.cyberdie22.clipc.ir.parser.syntax.SyntaxTree
 import java.util.*
 
 val INFO = AnsiFormat(TEXT_COLOR(169, 169, 169))
@@ -98,16 +95,20 @@ fun main(args: Array<String>) {
             continue
 
         val syntaxTree = SyntaxTree.parse(line)
+        val typeChecker = IRTypeChecker()
+        val boundExpression = typeChecker.bindExpression(syntaxTree.root)
+
+        val diagnostics = syntaxTree.diagnostics + typeChecker.diagnostics
 
         if (forceShowParseTree)
             prettyPrint(syntaxTree.root)
-        if (!syntaxTree.diagnostics.any() && showParseTree)
+        if (!diagnostics.any() && showParseTree)
             prettyPrint(syntaxTree.root)
 
-        if (syntaxTree.diagnostics.any())
-            syntaxTree.diagnostics.forEach(::println)
+        if (diagnostics.any())
+            diagnostics.forEach(::println)
         else {
-            val evaluator = Evaluator(syntaxTree.root)
+            val evaluator = Evaluator(boundExpression)
             val result = evaluator.evaluate()
             println(colorize(result.toString(), INFO))
         }

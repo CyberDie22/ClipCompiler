@@ -1,4 +1,4 @@
-package me.cyberdie22.clipc.ir.parser
+package me.cyberdie22.clipc.ir.parser.syntax
 
 import com.diogonunes.jcolor.Ansi.colorize
 import com.diogonunes.jcolor.AnsiFormat

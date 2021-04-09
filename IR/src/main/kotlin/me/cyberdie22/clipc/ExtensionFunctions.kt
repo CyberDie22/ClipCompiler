@@ -1,7 +1,6 @@
 package me.cyberdie22.clipc
 
 import me.cyberdie22.clipc.ir.lexer.SyntaxToken
-import me.cyberdie22.clipc.ir.parser.SyntaxNode
 import java.util.stream.Stream
 import kotlin.streams.toList
 
