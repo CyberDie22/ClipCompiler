@@ -4,9 +4,7 @@ package me.cyberdie22.clipc.ir
 import com.diogonunes.jcolor.Ansi.colorize
 import com.diogonunes.jcolor.AnsiFormat
 import com.diogonunes.jcolor.Attribute
-import me.cyberdie22.clipc.ir.lexer.SyntaxKind
 import me.cyberdie22.clipc.ir.parser.ir.*
-import me.cyberdie22.clipc.ir.parser.syntax.*
 import kotlin.math.pow
 
 val INFO = AnsiFormat(Attribute.TEXT_COLOR(169, 169, 169))
@@ -26,11 +24,11 @@ class Evaluator(private val root: IRExpression) {
         if (root is IRUnaryExpression) {
             val operand = evaluateExpression(root.operand)
 
-            return when (root.operatorKind) {
+            return when (root.operator.kind) {
                 IRUnaryOperatorKind.Identity -> +(operand as Int)
                 IRUnaryOperatorKind.Negation -> -(operand as Int)
                 IRUnaryOperatorKind.LogicalNegation -> !(operand as Boolean)
-                else -> throw Exception("Unexpected unary operator ${root.operatorKind}")
+                else -> throw Exception("Unexpected unary operator ${root.operator.kind}")
             }
         }
 
@@ -38,16 +36,16 @@ class Evaluator(private val root: IRExpression) {
             val left = evaluateExpression(root.left)
             val right = evaluateExpression(root.right)
 
-            return when (root.operatorKind) {
+            return when (root.operator.kind) {
                 IRBinaryOperatorKind.Plus -> (left as Int) + (right as Int)
                 IRBinaryOperatorKind.Minus -> (left as Int) - (right as Int)
-                IRBinaryOperatorKind.Times -> (left as Int) * (right as Int)
-                IRBinaryOperatorKind.Division -> (left as Int) / (right as Int)
+                IRBinaryOperatorKind.Multiply -> (left as Int) * (right as Int)
+                IRBinaryOperatorKind.Divide -> (left as Int) / (right as Int)
                 IRBinaryOperatorKind.Modulus -> (left as Int) % (right as Int)
                 IRBinaryOperatorKind.Exponent -> (left as Double).pow(right as Double).toInt()
                 IRBinaryOperatorKind.LogicalAnd -> (left as Boolean) && (right as Boolean)
                 IRBinaryOperatorKind.LogicalOr -> (left as Boolean) || (right as Boolean)
-                else -> throw Exception(colorize("Unexpected binary operator '${root.operatorKind}'", ERROR))
+                else -> throw Exception(colorize("Unexpected binary operator '${root.operator.kind}'", ERROR))
             }
         }
 
