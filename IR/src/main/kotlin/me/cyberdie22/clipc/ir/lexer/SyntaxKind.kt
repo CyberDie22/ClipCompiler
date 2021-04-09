@@ -13,7 +13,7 @@ enum class SyntaxKind {
     OpenParenthesisToken,
     CloseParenthesisToken,
     BadToken,
-    NumberExpression,
+    LiteralExpression,
     BinaryExpression,
     ParenthesizedExpression
 }
