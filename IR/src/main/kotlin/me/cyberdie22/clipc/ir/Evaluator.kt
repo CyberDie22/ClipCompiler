@@ -7,9 +7,8 @@ import com.diogonunes.jcolor.Attribute
 import me.cyberdie22.clipc.ir.lexer.SyntaxKind
 import me.cyberdie22.clipc.ir.parser.BinaryExpressionSyntax
 import me.cyberdie22.clipc.ir.parser.ExpressionSyntax
-import me.cyberdie22.clipc.ir.parser.NumberExpressionSyntax
+import me.cyberdie22.clipc.ir.parser.LiteralExpressionSyntax
 import me.cyberdie22.clipc.ir.parser.ParenthesizedExpressionSyntax
-import java.lang.Math.pow
 import kotlin.math.pow
 
 val INFO = AnsiFormat(Attribute.TEXT_COLOR(169, 169, 169))
@@ -26,8 +25,8 @@ class Evaluator(private val root: ExpressionSyntax) {
         // NumberExpression
         // ParenthesizedExpression
 
-        if (root is NumberExpressionSyntax)
-            return root.numberToken.value as Int
+        if (root is LiteralExpressionSyntax)
+            return root.literalToken.value as Int
 
         if (root is BinaryExpressionSyntax) {
             val left = evaluateExpression(root.left)
