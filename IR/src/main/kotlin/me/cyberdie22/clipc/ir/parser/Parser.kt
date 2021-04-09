@@ -12,7 +12,7 @@ val INFO = AnsiFormat(Attribute.TEXT_COLOR(169, 169, 169))
 val WARN = AnsiFormat(Attribute.YELLOW_TEXT())
 val ERROR = AnsiFormat(Attribute.TEXT_COLOR(139, 0, 0))
 
-class Parser(val text: String) {
+class Parser(text: String) {
     private val tokens: Array<SyntaxToken>
     private var position = 0
 
@@ -42,7 +42,7 @@ class Parser(val text: String) {
         return current
     }
 
-    private fun match(kind: SyntaxKind): SyntaxToken {
+    private fun matchToken(kind: SyntaxKind): SyntaxToken {
         if (current.kind == kind)
             return nextToken()
 
@@ -55,48 +55,33 @@ class Parser(val text: String) {
         get() = peek(0)
 
     fun parse(): SyntaxTree {
-        val expression = parseTerm()
-        val eofToken = match(SyntaxKind.EndOfFileToken)
+        val expression = parseExpression()
+        val eofToken = matchToken(SyntaxKind.EndOfFileToken)
         return SyntaxTree(diagnostics, expression, eofToken)
     }
 
-    private fun parseExpression(): ExpressionSyntax {
-        return parseTerm()
-    }
-
-    private fun parseTerm(): ExpressionSyntax {
-        var left = parseFactor()
-
-        while (current.kind == SyntaxKind.PlusToken ||
-            current.kind == SyntaxKind.MinusToken) {
-            val operatorToken = nextToken()
-            val right = parseFactor()
-            left = BinaryExpressionSyntax(left, operatorToken, right)
+    private fun getBinaryOperatorPrecedence(kind: SyntaxKind): Int {
+        return when (kind) {
+            in listOf(SyntaxKind.ExponentToken) -> 3
+            in listOf(SyntaxKind.TimesToken, SyntaxKind.DivideToken, SyntaxKind.ModuloToken) -> 2
+            in listOf(SyntaxKind.PlusToken, SyntaxKind.MinusToken) -> 1
+            else -> 0
         }
-        return left
     }
 
-    private fun parseFactor(): ExpressionSyntax {
-        var left = parsePower()
-
-        while ( current.kind == SyntaxKind.TimesToken  ||
-                current.kind == SyntaxKind.DivideToken ||
-                current.kind == SyntaxKind.ModuloToken) {
-            val operatorToken = nextToken()
-            val right = parsePower()
-            left = BinaryExpressionSyntax(left, operatorToken, right)
-        }
-        return left
-    }
-
-    private fun parsePower(): ExpressionSyntax {
+    private fun parseExpression(parentPrecedence: Int = 0): ExpressionSyntax {
         var left = parsePrimaryExpression()
 
-        while ( current.kind == SyntaxKind.ExponentToken) {
+        while (true) {
+            val precedence = getBinaryOperatorPrecedence(current.kind)
+            if (precedence == 0 || precedence <= parentPrecedence)
+                break
+
             val operatorToken = nextToken()
-            val right = parsePrimaryExpression()
+            val right = parseExpression(precedence)
             left = BinaryExpressionSyntax(left, operatorToken, right)
         }
+
         return left
     }
 
@@ -104,11 +89,11 @@ class Parser(val text: String) {
         if (current.kind == SyntaxKind.OpenParenthesisToken) {
             val left = nextToken()
             val expression = parseExpression()
-            val right = match(SyntaxKind.CloseParenthesisToken)
+            val right = matchToken(SyntaxKind.CloseParenthesisToken)
             return ParenthesizedExpressionSyntax(left, expression, right)
         }
-        val numberToken = match(SyntaxKind.NumberToken)
-        return NumberExpressionSyntax(numberToken)
+        val numberToken = matchToken(SyntaxKind.NumberToken)
+        return LiteralExpressionSyntax(numberToken)
     }
 
 }
