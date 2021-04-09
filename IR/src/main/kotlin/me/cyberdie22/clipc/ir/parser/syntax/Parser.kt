@@ -105,19 +105,25 @@ class Parser(text: String) {
 
 }
 
-fun SyntaxKind.getBinaryOperatorPrecedence(): Int {
+fun SyntaxKind.getUnaryOperatorPrecedence(): Int {
     return when (this) {
-        SyntaxKind.ExponentToken -> 5
-        SyntaxKind.TimesToken, SyntaxKind.DivideToken, SyntaxKind.ModuloToken -> 4
-        SyntaxKind.PlusToken, SyntaxKind.MinusToken -> 3
-        SyntaxKind.LogicalAndToken -> 2
-        SyntaxKind.LogicalOrToken -> 1
+        SyntaxKind.PlusToken, SyntaxKind.MinusToken, SyntaxKind.LogicalNotToken -> 7
         else -> 0
     }
 }
-fun SyntaxKind.getUnaryOperatorPrecedence(): Int {
+fun SyntaxKind.getBinaryOperatorPrecedence(): Int {
     return when (this) {
-        SyntaxKind.PlusToken, SyntaxKind.MinusToken, SyntaxKind.LogicalNotToken -> 3
+        SyntaxKind.ExponentToken -> 6
+
+        SyntaxKind.TimesToken, SyntaxKind.DivideToken, SyntaxKind.ModuloToken -> 5
+
+        SyntaxKind.PlusToken, SyntaxKind.MinusToken -> 4
+
+        SyntaxKind.EqualityToken, SyntaxKind.InequalityToken -> 3
+
+        SyntaxKind.LogicalAndToken -> 2
+
+        SyntaxKind.LogicalOrToken -> 1
         else -> 0
     }
 }

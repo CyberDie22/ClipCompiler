@@ -5,5 +5,7 @@ enum class IRBinaryOperatorKind {
     Multiply, Divide, Modulus,
     Exponent,
     LogicalAnd,
-    LogicalOr
+    LogicalOr,
+    Equals,
+    NotEquals
 }

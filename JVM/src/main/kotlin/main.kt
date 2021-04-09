@@ -4,10 +4,12 @@ import com.diogonunes.jcolor.Attribute.*
 import me.cyberdie22.clicommand.CLICommand
 import me.cyberdie22.clicommand.CLICommandManager
 import me.cyberdie22.clipc.ir.Evaluator
+import me.cyberdie22.clipc.ir.lexer.SyntaxKind
 import me.cyberdie22.clipc.ir.lexer.SyntaxToken
 import me.cyberdie22.clipc.ir.parser.ir.IRTypeChecker
 import me.cyberdie22.clipc.ir.parser.syntax.SyntaxNode
 import me.cyberdie22.clipc.ir.parser.syntax.SyntaxTree
+import me.cyberdie22.clipc.ir.parser.syntax.getBinaryOperatorPrecedence
 import java.util.*
 
 val INFO = AnsiFormat(TEXT_COLOR(169, 169, 169))

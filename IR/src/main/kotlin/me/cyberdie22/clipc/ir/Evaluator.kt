@@ -45,6 +45,8 @@ class Evaluator(private val root: IRExpression) {
                 IRBinaryOperatorKind.Exponent -> (left as Double).pow(right as Double).toInt()
                 IRBinaryOperatorKind.LogicalAnd -> (left as Boolean) && (right as Boolean)
                 IRBinaryOperatorKind.LogicalOr -> (left as Boolean) || (right as Boolean)
+                IRBinaryOperatorKind.Equals -> left == right
+                IRBinaryOperatorKind.NotEquals -> left != right
                 else -> throw Exception(colorize("Unexpected binary operator '${root.operator.kind}'", ERROR))
             }
         }

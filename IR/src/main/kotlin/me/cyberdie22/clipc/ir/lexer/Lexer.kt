@@ -83,9 +83,11 @@ class Lexer(private val text: String) {
             current == '^' -> return returnSyntaxTokenForCharacterLiteral('^', SyntaxKind.ExponentToken)
             current == '(' -> return returnSyntaxTokenForCharacterLiteral('(', SyntaxKind.OpenParenthesisToken)
             current == ')' -> return returnSyntaxTokenForCharacterLiteral(')', SyntaxKind.CloseParenthesisToken)
-            current == '!' -> return returnSyntaxTokenForCharacterLiteral('!', SyntaxKind.LogicalNotToken)
-            current == '&' && lookahead == '&' -> return returnSyntaxTokenForCharacterLiteral("||", SyntaxKind.LogicalAndToken, 2)
+            current == '!' && lookahead != '=' -> return returnSyntaxTokenForCharacterLiteral('!', SyntaxKind.LogicalNotToken)
+            current == '&' && lookahead == '&' -> return returnSyntaxTokenForCharacterLiteral("&&", SyntaxKind.LogicalAndToken, 2)
             current == '|' && lookahead == '|' -> return returnSyntaxTokenForCharacterLiteral("||", SyntaxKind.LogicalOrToken, 2)
+            current == '=' && lookahead == '=' -> return returnSyntaxTokenForCharacterLiteral("==", SyntaxKind.EqualityToken, 2)
+            current == '!' && lookahead == '=' -> return returnSyntaxTokenForCharacterLiteral("!=", SyntaxKind.InequalityToken, 2)
             else -> {
                 diagnostics.add(colorize("ERROR: Bad character input: '$current'", ERROR))
                 return SyntaxToken(SyntaxKind.BadToken, position++, text.subSequence(position - 1, position) as String, null)

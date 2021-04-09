@@ -19,6 +19,8 @@ enum class SyntaxKind {
     LogicalNotToken,
     LogicalAndToken,
     LogicalOrToken,
+    EqualityToken,
+    InequalityToken,
 
     // Expressions
     LiteralExpression,
